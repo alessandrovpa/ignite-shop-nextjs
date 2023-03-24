@@ -7,11 +7,12 @@ export const HomeContainer = stitchesConfig.styled('main', {
   marginLeft: 'auto',
 });
 
-export const Product = stitchesConfig.styled('a', {
+export const Product = stitchesConfig.styled('div', {
   background: 'linear-gradient(180deg, #1ea484 0%, #7465d4 100%)',
   borderRadius: 8,
   cursor: 'pointer',
   position: 'relative',
+  color: '$gray100',
 
   display: 'flex',
   alignItems: 'center',

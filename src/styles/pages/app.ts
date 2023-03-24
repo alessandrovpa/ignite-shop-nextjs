@@ -5,6 +5,8 @@ export const Container = stitchesConfig.styled('div', {
   flexDirection: 'column',
   alignItems: 'center',
   minHeight: '100vh',
+  backgroundColor: '$gray900',
+  color: '$gray100',
 });
 
 export const Header = stitchesConfig.styled('header', {
