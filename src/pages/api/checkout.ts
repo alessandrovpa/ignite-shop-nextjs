@@ -18,16 +18,15 @@ export default async function handler(
 
   const cancelUrl = `${process.env.NEXT_URL}`;
 
+  const items = priceId.map((price) => {
+    return { price, quantity: 1 };
+  });
+
   const checkoutSession = await stripe.checkout.sessions.create({
     success_url: successUrl,
     cancel_url: cancelUrl,
     mode: 'payment',
-    line_items: [
-      {
-        price: priceId,
-        quantity: 1,
-      },
-    ],
+    line_items: items,
   });
 
   return res.status(201).json({

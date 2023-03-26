@@ -1,19 +1,18 @@
+import { CartContextProvider } from '@/context/CartContext';
 import { globalStyles } from '@/styles/global';
-import { Container, Header } from '@/styles/pages/app';
+import { Container } from '@/styles/pages/app';
 import type { AppProps } from 'next/app';
-import Image from 'next/image';
-
-import logoImg from '../assets/Logo.svg';
+import { Header } from '../components/Header';
 
 globalStyles();
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <Container>
-      <Header>
-        <Image src={logoImg} alt="ignite shop logo" />
-      </Header>
-      <Component {...pageProps} />
-    </Container>
+    <CartContextProvider>
+      <Container>
+        <Header />
+        <Component {...pageProps} />
+      </Container>
+    </CartContextProvider>
   );
 }

@@ -3,17 +3,17 @@ import Image from 'next/image';
 import { useKeenSlider } from 'keen-slider/react';
 import 'keen-slider/keen-slider.min.css';
 
-import { stripe } from '@/lib/stripe';
-import { GetStaticProps } from 'next';
-import Stripe from 'stripe';
 import Link from 'next/link';
 import Head from 'next/head';
+import { GetStaticProps } from 'next';
+import Stripe from 'stripe';
+import { stripe } from '@/lib/stripe';
 
 interface ProductData {
   id: string;
   name: string;
   imageUrl: string;
-  price: string;
+  price: number;
 }
 interface HomeProps {
   products: ProductData[];
@@ -79,6 +79,7 @@ export const getStaticProps: GetStaticProps = async () => {
       }).format(price.unit_amount! / 100),
     };
   });
+
   return {
     props: {
       products,

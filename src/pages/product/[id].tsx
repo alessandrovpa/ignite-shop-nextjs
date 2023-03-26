@@ -1,15 +1,14 @@
+import { useCart } from '@/hooks/useCart';
 import { stripe } from '@/lib/stripe';
 import {
   ProductContainer,
   ProductImage,
   ProductInfo,
 } from '@/styles/pages/product';
-import axios from 'axios';
 import { GetStaticProps, GetStaticPaths } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
 import Stripe from 'stripe';
 
 interface ProductProps {
@@ -17,7 +16,8 @@ interface ProductProps {
     id: string;
     name: string;
     imageUrl: string;
-    price: string;
+    price: number;
+    formattedPrice: string;
     description: string;
     defaultPriceId: string;
   };
@@ -25,19 +25,10 @@ interface ProductProps {
 
 export default function Product({ product }: ProductProps) {
   const { isFallback } = useRouter();
-  const [isCreatingCheckout, setIsCreatingCheckout] = useState(false);
+  const { addItem } = useCart();
 
   async function handleBuyProduct() {
-    try {
-      setIsCreatingCheckout(true);
-      const response = await axios.post(`/api/checkout`, {
-        priceId: product.defaultPriceId,
-      });
-      window.location.href = response.data.checkoutUrl;
-    } catch (error) {
-      setIsCreatingCheckout(false);
-      alert('Falha no checkout!');
-    }
+    addItem(product);
   }
 
   if (isFallback) {
@@ -56,11 +47,9 @@ export default function Product({ product }: ProductProps) {
         </ProductImage>
         <ProductInfo>
           <h1>{product.name}</h1>
-          <h2>{product.price}</h2>
+          <h2>{product.formattedPrice}</h2>
           <p>{product.description}</p>
-          <button onClick={handleBuyProduct} disabled={isCreatingCheckout}>
-            Comprar agora
-          </button>
+          <button onClick={handleBuyProduct}>Adicionar ao carrinho</button>
         </ProductInfo>
       </ProductContainer>
     </>
@@ -90,7 +79,8 @@ export const getStaticProps: GetStaticProps<any, { id: string }> = async ({
         id: product.id,
         name: product.name,
         imageUrl: product.images[0],
-        price: new Intl.NumberFormat('pt-BR', {
+        price: price.unit_amount,
+        formattedPrice: new Intl.NumberFormat('pt-BR', {
           style: 'currency',
           currency: 'BRL',
         }).format(price.unit_amount! / 100),

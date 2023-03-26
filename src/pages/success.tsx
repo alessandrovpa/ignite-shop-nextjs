@@ -1,3 +1,4 @@
+import { ProductItem } from '@/components/modal';
 import { stripe } from '@/lib/stripe';
 import { ImageContainer, SuccessContainer } from '@/styles/pages/success';
 import { GetServerSideProps } from 'next';
@@ -10,8 +11,7 @@ import Stripe from 'stripe';
 interface SuccessProps {
   checkoutInfo: {
     customerName: string;
-    itemName: string;
-    imageUrl: string;
+    imagesUrl: string[];
   };
 }
 
@@ -31,18 +31,17 @@ export default function Success({ checkoutInfo }: SuccessProps) {
 
       <SuccessContainer>
         <h1>Compra efetuada!</h1>
-        <ImageContainer>
-          <Image
-            src={checkoutInfo.imageUrl}
-            width={120}
-            height={110}
-            alt={checkoutInfo.itemName}
-          />
-        </ImageContainer>
+        <div>
+          {checkoutInfo.imagesUrl.map((imageUrl) => (
+            <ImageContainer key={imageUrl}>
+              <Image src={imageUrl} width={120} height={110} alt="product" />
+            </ImageContainer>
+          ))}
+        </div>
         <p>
-          Uhuul <strong>{checkoutInfo.customerName}</strong>, sua{' '}
-          <strong>{checkoutInfo.itemName}</strong> já está a caminho da sua
-          casa.
+          Uhuul <strong>{checkoutInfo.customerName}</strong>, sua compra de{' '}
+          {checkoutInfo.imagesUrl.length} camisetas já está a caminho da sua
+          casa
         </p>
         <Link href="/">Voltar ao catálogo</Link>
       </SuccessContainer>
@@ -66,14 +65,15 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
     expand: ['line_items', 'line_items.data.price.product'],
   });
 
-  const item = response.line_items.data[0].price.product as Stripe.Product;
+  const imagesUrl = response.line_items.data.map((item) => {
+    return item.price.product.images[0];
+  });
 
   return {
     props: {
       checkoutInfo: {
         customerName: response.customer_details.name,
-        itemName: item.name,
-        imageUrl: item.images[0],
+        imagesUrl,
       },
     },
   };
